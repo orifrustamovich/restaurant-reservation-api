@@ -1,0 +1,50 @@
+version: '3.9'
+
+# services = container'lar
+services:
+
+  # 1-container: PostgreSQL ma'lumotlar bazasi
+  db:
+    image: postgres:15-alpine   # Docker Hub'dan tayyor image
+    volumes:
+      # Named volume — container o'chirilsa ham ma'lumot qoladi
+      # postgres_data (quyida e'lon qilingan) → /var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      # ${DB_NAME} → .env fayldan o'qiydi
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    healthcheck:
+      # DB tayyor bo'lganini tekshiradi
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2-container: Django web server
+  web:
+    # Dockerfile asosida image yaratadi
+    build: .
+    volumes:
+      # .:/app → loyiha papkangiz container ichidagi /app ga bog'lanadi
+      # Kod o'zgarsa, container ichida ham o'zgaradi (restart shart emas)
+      - .:/app
+      - media_files:/app/media
+    ports:
+      # 8000:8000 → Mac'ingizda localhost:8000 ishlaydi
+      - "8000:8000"
+    env_file:
+      # .env fayldan barcha o'zgaruvchilarni oladi
+      - .env
+    depends_on:
+      db:
+        # db container "healthy" bo'lguncha kutadi
+        condition: service_healthy
+
+# Named volumes e'lon qilinishi
+volumes:
+  postgres_data:   # DB ma'lumotlari
+  media_files:     # Yuklangan rasmlar
