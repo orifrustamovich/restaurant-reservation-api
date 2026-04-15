@@ -123,7 +123,6 @@ DB_PORT=5432
 # Search Restaurant
 GET /api/restaurants/?search=sushi&min_rating=4.0&is_active=true
 
-# B
 ```
 
 ## 👨‍💻 Author
