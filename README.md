@@ -31,7 +31,7 @@ A production-ready RESTful API for managing restaurant reservations, built with 
 ## Quick Start (Docker)
 
 ```bash
-git clone https://github.com/yourusername/restaurant-reservation-api.git
+git clone https://github.com/orifrustamovich/restaurant-reservation-api
 cd restaurant-reservation-api
 
 cp .env.example .env    # configure file .env 
