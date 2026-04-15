@@ -51,7 +51,7 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-# .env faylni sozlang (DB_HOST=localhost)
+# configure file .env  (DB_HOST=localhost)
 cp .env.example .env
 
 python manage.py migrate
