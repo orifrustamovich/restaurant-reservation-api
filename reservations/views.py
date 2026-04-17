@@ -30,14 +30,21 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsReservationOwner()]
         return [IsAuthenticated()]
 
+
     def get_queryset(self):
-        """
-        Admin — hamma bronlarni ko'radi.
-        Oddiy foydalanuvchi — faqat o'zinikini.
-        """
         user = self.request.user
+
+        # Admin — hamma bronlarni ko'radi
         if user.is_staff:
             return super().get_queryset()
+
+        # Owner — o'z restoranlariga kelgan bronlarni ko'radi
+        if user.role == 'owner':
+            return super().get_queryset().filter(
+                table__restaurant__owner=user
+            )
+
+        # Customer — faqat o'z bronlarini ko'radi
         return super().get_queryset().filter(customer=user)
 
     def perform_create(self, serializer):
