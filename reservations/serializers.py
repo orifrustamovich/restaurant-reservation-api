@@ -88,13 +88,8 @@ class ReservationSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ReservationCreateSerializer(serializers.ModelSerializer):
-    """
-    Create uchun — customer o'zi belgilanadi, status default.
-    Nima uchun alohida serializer?
-    Create da customer = request.user avtomatik qo'shiladi.
-    """
 
+class ReservationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = [
@@ -102,6 +97,62 @@ class ReservationCreateSerializer(serializers.ModelSerializer):
             'party_size', 'special_requests',
         ]
 
-    # ReservationSerializer'dagi validate metodlarini ko'chiramiz
-    validate_reservation_date = ReservationSerializer.validate_reservation_date
-    validate = ReservationSerializer.validate
+    def validate_reservation_date(self, value):
+        """O'tib ketgan sanaga bron qilib bo'lmaydi"""
+        if value < timezone.now().date():
+            raise serializers.ValidationError(
+                "O'tib ketgan sanaga bron qilib bo'lmaydi."
+            )
+        return value
+
+    def validate(self, attrs):
+        # Start time end time dan oldin bo'lishi kerak
+        if attrs.get('start_time') and attrs.get('end_time'):
+            if attrs['start_time'] >= attrs['end_time']:
+                raise serializers.ValidationError(
+                    "Boshlanish vaqti tugash vaqtidan oldin bo'lishi kerak."
+                )
+
+        table = attrs.get('table')
+        date  = attrs.get('reservation_date')
+        start = attrs.get('start_time')
+        end   = attrs.get('end_time')
+
+        if table and date and start and end:
+            existing = Reservation.objects.filter(
+                table=table,
+                reservation_date=date,
+                status__in=['pending', 'confirmed'],
+            )
+            for reservation in existing:
+                if reservation.start_time < end and reservation.end_time > start:
+                    raise serializers.ValidationError(
+                        f"Bu stol {reservation.start_time}—{reservation.end_time} "
+                        f"vaqtida allaqachon band."
+                    )
+
+        if table and attrs.get('party_size'):
+            if attrs['party_size'] > table.capacity:
+                raise serializers.ValidationError(
+                    f"Bu stolga maksimum {table.capacity} kishi sig'adi."
+                )
+
+        return attrs
+
+# class ReservationCreateSerializer(serializers.ModelSerializer):
+#     """
+#     Create uchun — customer o'zi belgilanadi, status default.
+#     Nima uchun alohida serializer?
+#     Create da customer = request.user avtomatik qo'shiladi.
+#     """
+#
+#     class Meta:
+#         model = Reservation
+#         fields = [
+#             'table', 'reservation_date', 'start_time', 'end_time',
+#             'party_size', 'special_requests',
+#         ]
+#
+#     # ReservationSerializer'dagi validate metodlarini ko'chiramiz
+#     validate_reservation_date = ReservationSerializer.validate_reservation_date
+#     validate = ReservationSerializer.validate
