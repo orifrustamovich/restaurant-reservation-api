@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',  # logout uchun
+    'rest_framework_simplejwt.token_blacklist',  # for logout
     'django_filters',
     'drf_spectacular',
     'corsheaders',
@@ -89,7 +89,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# PostgreSQL ulanish
+# Connect postgreSQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -109,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Seoul'  # Koreya vaqt zonasi
+TIME_ZONE = 'Asia/Seoul'  # Korean time
 USE_I18N = True
 USE_TZ = True
 
@@ -121,22 +121,22 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CustomUser modelini ishlatishini Django'ga bildiramiz
+# to use the CustomUser model
 AUTH_USER_MODEL = 'users.CustomUser'
 
 # ==============================
-# Django REST Framework sozlamalari
+# Django REST Framework settings
 # ==============================
 REST_FRAMEWORK = {
     # Default authentication — JWT Token
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    # Default permission — faqat autentifikatsiya qilinganlar
+    # Default permission — only authenticated users
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    # Pagination — sahifalash
+    # Pagination
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     # Filter backend
@@ -145,23 +145,23 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
-    # Swagger uchun schema generator
+    # Schema generator for Swagger
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # ==============================
-# JWT Token sozlamalari
+# JWT Token settings
 # ==============================
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),   # Access token 1 soat
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       # Refresh token 7 kun
-    'ROTATE_REFRESH_TOKENS': True,    # Yangi refresh olganingda eskilari o'chadi
-    'BLACKLIST_AFTER_ROTATION': True, # Logout imkon beradi
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),   # Access token 1 hour
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       # Refresh token 7 days
+    'ROTATE_REFRESH_TOKENS': True,    # Refresh token and old tokens will expire
+    'BLACKLIST_AFTER_ROTATION': True, # Logout option
     'AUTH_HEADER_TYPES': ('Bearer',), # Authorization: Bearer <token>
 }
 
 # ==============================
-# drf-spectacular (Swagger) sozlamalari
+# drf-spectacular (Swagger) settings
 # ==============================
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Restaurant Reservation API',
