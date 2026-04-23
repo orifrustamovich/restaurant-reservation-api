@@ -74,6 +74,13 @@ DB_PASSWORD=your-password
 DB_HOST=db
 DB_PORT=5432
 ```
+## Setup
+
+```bash
+cp .env.example .env
+# Fill the .env file with your own values
+docker compose up --build
+```
 
 ## API Endpoints
 
